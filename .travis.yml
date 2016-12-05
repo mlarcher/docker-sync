@@ -1,0 +1,42 @@
+language: go
+
+sudo: required
+
+os:
+  - linux
+  - osx
+
+branches:
+  only:
+    - master
+    - tags
+
+services:
+  - docker
+
+before_script:
+  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then
+      brew update &> /dev/null; OPAM_SWITCH=4.04.0;
+      brew install opam;
+    fi
+
+script:
+  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then make unison-mac ; fi;
+  - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then make unison-alpine ; fi
+
+after_success:
+  - if [[ "$TRAVIS_BRANCH" == "master" ]] && [[ "$TRAVIS_OS_NAME" == "linux" ]]; then
+      docker login -u="$DOCKER_USERNAME" -p="$DOCKER_PASSWORD";
+      make publish;
+    fi
+  - if [[ -n "$TRAVIS_TAG" ]] && [[ "$TRAVIS_OS_NAME" == "linux" ]]; then
+      docker login -e="$DOCKER_EMAIL" -u="$DOCKER_USERNAME" -p="$DOCKER_PASSWORD";
+      VERSION=$TRAVIS_TAG make publish;
+    fi
+
+deploy:
+  provider: releases
+  api_key: $GITHUB_OAUTH
+  file: output/mac/unison
+  on:
+    tags: true

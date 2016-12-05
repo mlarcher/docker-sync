@@ -3,6 +3,8 @@ BUILD_DIR ?= build
 OUTPUT_DIR ?= output
 ALPINE_IMAGE ?= alpine:3.4
 
+VERSION ?= latest
+
 
 # Add the following 'help' target to your Makefile
 # And add help text after each target name starting with '\#\#'
@@ -36,7 +38,7 @@ unison-mac: ## Build unison for mac
 	@cp ${BUILD_DIR}/unison/src/unison ${OUTPUT_DIR}/mac/
 
 unison-alpine: ## Build unison for linux alpine image
-	@docker run -ti -v $PWD:/data -w /data ${ALPINE_IMAGE} /bin/sh -c "apk --update-cache add make && make _unison-linux-alpine"
+	@docker run -ti -v ${PWD}:/data -w /data ${ALPINE_IMAGE} /bin/sh -c "apk --update-cache add make && make _unison-alpine"
 
 _unison-alpine: ## Build unison on linux alpine image
 	@apk update
@@ -48,6 +50,10 @@ _unison-alpine: ## Build unison on linux alpine image
 	@PATCH_PATH=$${PWD} && cd ${BUILD_DIR}/unison && patch -p0 < unison_alpine.patch
 	@cd ${BUILD_DIR}/unison && make UISTYLE=text NATIVE=true
 	@cp ${BUILD_DIR}/unison/src/unison ${OUTPUT_DIR}/alpine/
+
+publish:
+	@docker build -t keepitcool/docker-sync:${VERSION} .
+	@docker push keepitcool/docker-sync:${VERSION}
 
 clean: ## Clean 
 	@rm -R build
