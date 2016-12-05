@@ -9,7 +9,7 @@ os:
 branches:
   only:
     - master
-    - tags
+    - /[0-9]\.[0-9]\.[0-9]/
 
 services:
   - docker
@@ -35,8 +35,10 @@ after_success:
     fi
 
 deploy:
+  on:
+    tags: true
+    condition: $TRAVIS_OS_NAME = osx
   provider: releases
   api_key: $GITHUB_OAUTH
   file: output/mac/unison
-  on:
-    tags: true
+  skip_cleanup: true
