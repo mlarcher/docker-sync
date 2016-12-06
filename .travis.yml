@@ -6,6 +6,8 @@ os:
   - linux
   - osx
 
+osx_image: xcode8.1
+
 branches:
   only:
     - master
@@ -24,6 +26,20 @@ script:
   - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then make unison-mac ; fi;
   - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then make unison-alpine ; fi
 
+before_deploy:
+  - if [[ -n "$TRAVIS_TAG" ]] && [[ "$TRAVIS_OS_NAME" == "osx" ]]; then
+      VERSION=$TRAVIS_TAG make package-mac-unison;
+    fi
+
+deploy:
+  on:
+    tags: true
+    condition: $TRAVIS_OS_NAME = osx
+  provider: releases
+  api_key: $GITHUB_OAUTH
+  file: output/unison-${TRAVIS_TAG}-osx64.tar.gz
+  skip_cleanup: true
+
 after_success:
   - if [[ "$TRAVIS_BRANCH" == "master" ]] && [[ "$TRAVIS_OS_NAME" == "linux" ]]; then
       docker login -u="$DOCKER_USERNAME" -p="$DOCKER_PASSWORD";
@@ -33,12 +49,3 @@ after_success:
       docker login -e="$DOCKER_EMAIL" -u="$DOCKER_USERNAME" -p="$DOCKER_PASSWORD";
       VERSION=$TRAVIS_TAG make publish;
     fi
-
-deploy:
-  on:
-    tags: true
-    condition: $TRAVIS_OS_NAME = osx
-  provider: releases
-  api_key: $GITHUB_OAUTH
-  file: output/mac/unison
-  skip_cleanup: true

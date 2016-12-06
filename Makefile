@@ -55,5 +55,12 @@ publish:
 	@docker build -t keepitcool/docker-sync:${VERSION} .
 	@docker push keepitcool/docker-sync:${VERSION}
 
+package-mac-unison:
+	@-rm -R output/unison-${VERSION}-osx64
+	@mkdir -p output/unison-${VERSION}-osx64
+	@cp output/mac/unison output/unison-${VERSION}-osx64
+	@cd output && tar cvzf unison-${VERSION}-osx64.tar.gz unison-${VERSION}-osx64/
+	@-rm -R output/unison-${VERSION}-osx64
+
 clean: ## Clean 
 	@rm -R build
