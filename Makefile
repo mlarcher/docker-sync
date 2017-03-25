@@ -3,7 +3,7 @@ BUILD_DIR ?= build
 OUTPUT_DIR ?= output
 ALPINE_IMAGE ?= alpine:3.4
 
-VERSION ?= latest
+VERSION ?= 0.0.2
 
 
 # Add the following 'help' target to your Makefile
@@ -20,9 +20,9 @@ HELP_HELPER = \
     print "  ${YELLOW}$$_->[0]${RESET}$$sep${GREEN}$$_->[1]${RESET}\n"; \
     }; \
     print "\n"; }
-    
+
 help: ##prints help
-	@perl -e '$(HELP_HELPER)' $(MAKEFILE_LIST)    
+	@perl -e '$(HELP_HELPER)' $(MAKEFILE_LIST)
 
 get-unison-sources: ## Fetch unison sources
 	@-rm -R  ${BUILD_DIR}/unison ${BUILD_DIR}/${UNISON_VERSION}.tar.gz
@@ -52,8 +52,8 @@ _unison-alpine: ## Build unison on linux alpine image
 	@cp ${BUILD_DIR}/unison/src/unison ${OUTPUT_DIR}/alpine/
 
 publish:
-	@docker build -t keepitcool/docker-sync:${VERSION} .
-	@docker push keepitcool/docker-sync:${VERSION}
+	@docker build -t somatt/docker-sync:${VERSION} .
+	@docker push somatt/docker-sync:${VERSION}
 
 package-mac-unison:
 	@-rm -R output/unison-${VERSION}-osx64
@@ -62,5 +62,5 @@ package-mac-unison:
 	@cd output && tar cvzf unison-${VERSION}-osx64.tar.gz unison-${VERSION}-osx64/
 	@-rm -R output/unison-${VERSION}-osx64
 
-clean: ## Clean 
+clean: ## Clean
 	@rm -R build

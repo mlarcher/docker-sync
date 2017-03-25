@@ -1,5 +1,5 @@
 FROM alpine:3.4
-MAINTAINER Nadim
+MAINTAINER Matthieu Larcher <mlarcher@ringabell.org>
 
 # Set working directory to be the home directory
 WORKDIR /
